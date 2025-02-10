@@ -14,7 +14,7 @@ account_number = 123456789
 thames_water = ThamesWater(email=email, password=password, account_number=account_number)
 ```
 
-You can then retrieve your hourly data and convert it into a pandas seriess
+You can then retrieve your hourly data and convert it into a pandas series
 
 ```python
 from thameswaterclient import meter_usage_lines_to_timeseries
