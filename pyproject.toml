@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "thameswaterclient"
-version = "0.1.0"
+version = "0.1.1"
 description = "A Python client for retrieving hourly meter data from Thames Water"
 authors = ["Ayrton Bourn <ayrtonbourn@outlook.com>"]
 license = "MIT"
@@ -16,6 +16,9 @@ python-dotenv = "^1.0.1"
 [tool.poetry.dev-dependencies]
 pytest = "^7.4.0"
 mypy = "^1.7.0"
+
+[project.urls]
+Homepage = "https://github.com/AyrtonB/Thames-Water/"
 
 [build-system]
 requires = ["poetry-core"]
