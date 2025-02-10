@@ -19,7 +19,7 @@ You can then retrieve your hourly data and convert it into a pandas seriess
 ```python
 from thameswaterclient import meter_usage_lines_to_timeseries
 
-meter = 311738552
+meter = 123456789
 start = datetime.date(2024, 10, 1)
 end = datetime.date(2024, 12, 31)
 
