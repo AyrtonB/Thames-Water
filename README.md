@@ -1,5 +1,7 @@
 # Thames-Water
 
+`pip install thameswaterclient`
+
 Thames water API client, login with:
 
 ```python
