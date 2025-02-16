@@ -34,6 +34,12 @@ class MeterUsage:
     IsExtraMonthConsumptionMessage: bool
     Lines: list[Line] = field(default_factory=list)
     AlertsValues: Optional[dict] = field(default_factory=dict)  # assumption that it could be a dict
+
+@dataclass
+class Measurement:
+    hour_start: datetime
+    usage: int  # Usage
+    total: int  # Read
     
     
 class ThamesWater:
@@ -274,12 +280,21 @@ def date_range(
     
 
 def meter_usage_lines_to_timeseries(
-    start: datetime.date, 
-    end: datetime.date, 
+    start: datetime.date,
     lines: list[Line],
-    metric: Literal['read', 'usage'] = 'read',
-) -> dict[datetime.datetime, int]:
-    return dict(zip(
-        date_range(start, end+datetime.timedelta(days=1)),
-        [line.Read if metric=='read' else line.Usage for line in lines]
-    ))
+) -> list[Measurement]:
+    """Convert meter usage lines to a time series of Measurement objects
+
+    Assumptions:
+    * Lines is hourly
+    * Lines is contiguous (no gaps)
+    """
+    timestamps = date_range(start, start+datetime.timedelta(hours=len(lines)))
+    return [
+        Measurement(
+            hour_start=timestamps[i],
+            usage=int(line.Usage),
+            total=int(line.Read),
+        )
+        for i, line in enumerate(lines)
+    ]
