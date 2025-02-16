@@ -20,6 +20,6 @@ def test_hourly_reading_retrieval():
     end = datetime.date(2025, 2, 16)
 
     meter_usage = thames_water.get_meter_usage(meter, start, end)
-    s_readings = meter_usage_lines_to_timeseries(start, end, meter_usage.Lines)
+    readings = meter_usage_lines_to_timeseries(start, end, meter_usage.Lines)
 
-    assert s_readings.size > 0
+    assert len(readings) > 0

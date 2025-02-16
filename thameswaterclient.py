@@ -1,13 +1,13 @@
+import os
+import uuid
 import base64
 import hashlib
-import os
-import requests
-import uuid
+import zoneinfo
 import datetime
 from typing import Optional, Literal
 from dataclasses import dataclass, field
 
-import pandas as pd
+import requests
 
 
 @dataclass
@@ -247,8 +247,39 @@ class ThamesWater:
         return MeterUsage(**data)
     
 
-def meter_usage_lines_to_timeseries(start: datetime.date, end: datetime.date, lines: list[Line]) -> pd.Series:
-    return pd.Series(dict(zip(
-        pd.date_range(start, end+datetime.timedelta(days=1), freq='H', tz='Europe/London'),
-        [line.Read for line in lines]
-    )), name='meter_read_liters')
+def date_range(
+    start: datetime.datetime, 
+    end: datetime.datetime, 
+    freq: datetime.timedelta = datetime.timedelta(hours=1),
+    tz: str = "Europe/London",
+):
+    if isinstance(start, datetime.date):
+        start = datetime.datetime(start.year, start.month, start.day)
+    if isinstance(end, datetime.date):
+        end = datetime.datetime(end.year, end.month, end.day)
+    if start.tzinfo is not None or end.tzinfo is not None:
+        raise ValueError("Input datetimes must be timezone-naive. Convert them to naive before calling this function.")
+
+    tzinfo = zoneinfo.ZoneInfo(tz)
+    start = start.replace(tzinfo=tzinfo)
+    end = end.replace(tzinfo=tzinfo)
+
+    result = []
+    current = start
+    while current <= end:
+        result.append(current)
+        current += freq
+
+    return result
+    
+
+def meter_usage_lines_to_timeseries(
+    start: datetime.date, 
+    end: datetime.date, 
+    lines: list[Line],
+    metric: Literal['read', 'usage'] = 'read',
+) -> dict[datetime.datetime, int]:
+    return dict(zip(
+        date_range(start, end+datetime.timedelta(days=1)),
+        [line.Read if metric=='read' else line.Usage for line in lines]
+    ))
