@@ -16,8 +16,8 @@ meter = os.environ['METER']
 def test_hourly_reading_retrieval():
     thames_water = ThamesWater(email=email, password=password, account_number=account_number)
 
-    start = datetime.date(2025, 1, 1)
-    end = datetime.date(2025, 1, 7)
+    start = datetime.date(2025, 2, 11)
+    end = datetime.date(2025, 2, 16)
 
     meter_usage = thames_water.get_meter_usage(meter, start, end)
     s_readings = meter_usage_lines_to_timeseries(start, end, meter_usage.Lines)

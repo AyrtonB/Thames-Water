@@ -5,24 +5,24 @@ import requests
 import uuid
 import datetime
 from typing import Optional, Literal
+from dataclasses import dataclass, field
 
 import pandas as pd
-from pydantic import BaseModel
 
 
-class Line(BaseModel):
+@dataclass
+class Line:
     Label: str
     Usage: float
     Read: float
     IsEstimated: bool
     MeterSerialNumberHis: str
 
-class MeterUsage(BaseModel):
+@dataclass
+class MeterUsage:
     IsError: bool
     IsDataAvailable: bool
-    Lines: list[Line]
     IsConsumptionAvailable: bool
-    AlertsValues: Optional[dict] = None  # assumption that it could be a dict
     TargetUsage: float
     AverageUsage: float
     ActualUsage: float
@@ -32,6 +32,8 @@ class MeterUsage(BaseModel):
     IsMOPartialCustomer: bool
     IsMOCompleteCustomer: bool
     IsExtraMonthConsumptionMessage: bool
+    Lines: list[Line] = field(default_factory=list)
+    AlertsValues: Optional[dict] = field(default_factory=dict)  # assumption that it could be a dict
     
     
 class ThamesWater:
@@ -239,7 +241,10 @@ class ThamesWater:
 
         r = self.s.get(url, params=params, headers=headers)
         r.raise_for_status()
-        return MeterUsage.model_validate(r.json())
+
+        data = r.json()
+        data["Lines"] = [Line(**line) for line in data["Lines"]]
+        return MeterUsage(**data)
     
 
 def meter_usage_lines_to_timeseries(start: datetime.date, end: datetime.date, lines: list[Line]) -> pd.Series:
